@@ -2,11 +2,21 @@
 
 // 入力ダイアログを表示 ＋ 入力内容を user に代入
 var user = "";
-user = window.prompt("学籍番号を入力してください", "");
+while(user === ""){
+  user = window.prompt("学籍番号を入力してください", "");
+  if(user === ""){
+    alert("学籍番号を入力してください");
+    user = window.prompt("学籍番号を入力してください", "");
+  }  
+}
 
 console.log(user);
 
-//結果を配列に格納する
+var data_size = 14;
+var start_data = [];
+
+//1問ごとに取得するデータ配列
+var alldata = [];
 
 //現在の日付時刻を取得する
 function getCurrentTime() {
@@ -26,7 +36,35 @@ function padZero(num) {
 	}
 	return result;
 }
-console.log(getCurrentTime());
+
+//現在の日付を取得
+function getCurrentDate() {
+	var now = new Date();
+	var res = now.getFullYear() + padZero(now.getMonth() + 1) + 
+		padZero(now.getDate()) + padZero(now.getHours()) +  
+		padZero(now.getMinutes()) +  padZero(now.getSeconds());
+	return res;
+}
+var train_date = getCurrentDate();
+var new_sheet = train_date + "_" +  user;
+console.log(new_sheet);
+/*
+var datetime = [];
+var copy = new Date();
+datetime.push(copy);
+*/
+
+var now = getCurrentTime();
+
+start_data.push(now);
+for(let i=1;i<data_size;i++){
+  start_data.push(""); 
+}
+console.log(start_data);
+alldata.push(start_data);
+console.log(alldata);
+
+
 
 //問題番号を格納
 var question_num = 0;
@@ -35,6 +73,7 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max + 1 - min)) + min;
 }
 //画像の番号を格納する配列
+/*
 var img_array = [];
 var min = 0;
 var max = 19;
@@ -48,11 +87,64 @@ for (let i = 0; i < length; i++) {
     }
   }
 }
+*/
+//var filename = "C:\home\src\App\src\image0";
+//var fileObj = new File([filename], "0.jpg");
+//var flag = fileObj.exists;
+var img_array = [];
+function chk(url){
+  return new Promise(function (resolve, reject) {
+      const img = new Image();
+      img.src = 'src/image0/'+url+'.jpg';
+      img.onload = function () { 
+        img_array.push(url);
+        console.log(img_array);
+        return resolve(url) 
+      };
+      img.onerror = function () { return reject(url) };
+  });
+};
+
+for(let i=1;i<301;i++){
+chk(i)
+  .then((url) => {
+      //console.log('存在します');
+  })
+  .catch((url) => {
+      //console.log('存在しません');
+  });
+}
+const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+await _sleep(5000);
+
+function arrayShuffle(array) {
+  for(let i = (array.length - 1); 0 < i; i--){
+
+    // 0〜(i+1)の範囲で値を取得
+    let r = Math.floor(Math.random() * (i + 1));
+
+    // 要素の並び替えを実行
+    let tmp = array[i];
+    array[i] = array[r];
+    array[r] = tmp;
+  }
+  return array;
+}
+
+// 配列を5回シャッフルする
+for(let i=0; i < 5; i++) {
+  console.log(arrayShuffle(img_array));
+}
 //var img_rand = Math.floor(Math.random() * (max + 1 - min)) + min;
+
+
+
 
 //1問目の画像を描画
 const target1 = document.getElementById("sample");
-target1.setAttribute("src", `src/image0/${img_array[0] * 10}.jpg`);
+target1.setAttribute("src", `src/image0/${img_array[0]}.jpg`);
+console.log();
 
 //解いた問題がの正解・不正解を格納する配列
 var result_array = [];
@@ -66,11 +158,11 @@ var decision_select = ["良品", "不良品"];
 //サンプル画像と解答から正解・不正解かを判定して返す関数
 function decision(select){
   var decision_answer = 0;
-  if(img_array[question_num]*10 < 150){
+  if(img_array[question_num] < 150){
     if(select != 0){
       decision_answer = 1;
     }
-  }else if(img_array[question_num]*10 >= 150){
+  }else if(img_array[question_num] >= 150){
     if(select != 1){
       decision_answer = 1;
     }
@@ -94,16 +186,42 @@ function crt_ans_rate(result_array){
 //「良品」ボタンを押したときに次の問題を表示してデータを配列に渡す
 function countUp_quality() {
   var checkbox = [];
+  var checkflag = [];
   for (let i = 0; i < el.length; i++) {
     checkbox[i] = el[i].checked;
+    if(checkbox[i]){
+      checkflag[i]=1;
+    }else{
+      checkflag[i]=0;
+    }
   }
-  console.log(checkbox);
 
   var dec = decision(0);
   result_array.push(decision_result[dec]);
   select_array.push(decision_select[0]);
 
-  console.log(getCurrentTime());
+  //一時配列まとめて格納
+  var onetime_data = [];
+  onetime_data.push(getCurrentTime());
+  onetime_data.push(question_num+1);
+  onetime_data.push(result_array[question_num]);
+  onetime_data.push(img_array[question_num]);
+  onetime_data.push(0);
+  for(let i=0;i<8;i++){
+    onetime_data.push(checkflag[i]);
+  }
+  onetime_data.push(1);
+  alldata.push(onetime_data);
+  console.log(alldata[question_num+1]);
+  console.log(alldata);
+
+  /*
+  var  time = new Date();
+  datetime.push(time);
+  var diff =  (datetime[question_num + 1].getTime() - datetime[question_num].getTime()) / 1000;
+  console.log(diff);
+  */
+
   /*
   let total = result_array.reduce(function(sum, element){
     return sum + element;
@@ -111,13 +229,13 @@ function countUp_quality() {
   */
 
   document.getElementById("answer_log").innerHTML = `<p>「${result_array[question_num]}」:あなたの前回の解答は「良品」(正答率:${crt_ans_rate(result_array)}%)</p>`;
-  document.getElementById("answer_img").innerHTML = `<img id="sample"src="src/image0/${img_array[question_num] * 10}.jpg"width="500px"height="168px" style="display:block;">`;
+  document.getElementById("answer_img").innerHTML = `<img id="sample"src="src/image0/${img_array[question_num]}.jpg"width="500px"height="168px" style="display:block;">`;
 
   question_num++;
   document.getElementById("app").innerHTML = `<h1>No.${question_num + 1}</h1>`;
   const target = document.getElementById("sample");
-  target.setAttribute("src", `src/image0/${img_array[question_num] * 10}.jpg`);
-  target.setAttribute("alt", `画像の代わり${img_array[question_num] * 10}`);
+  target.setAttribute("src", `src/image0/${img_array[question_num]}.jpg`);
+  target.setAttribute("alt", `画像の代わり${img_array[question_num]}`);
   
   //let answer = postData_quality();
   
@@ -131,23 +249,43 @@ function countUp_quality() {
 //「不良品」ボタンを押したときに次の問題を表示してデータを配列に渡す
 function countUp_defective() {
   var checkbox = [];
+  var checkflag = [];
   for (let i = 0; i < el.length; i++) {
     checkbox[i] = el[i].checked;
+    if(checkbox[i]){
+      checkflag[i]=1;
+    }else{
+      checkflag[i]=0;
+    }
   }
-  console.log(checkbox);
   
   var dec = decision(1);
   result_array.push(decision_result[dec]);
   select_array.push(decision_select[1]);
 
+  //一時配列まとめて格納
+  var onetime_data = [];
+  onetime_data.push(getCurrentTime());
+  onetime_data.push(question_num+1);
+  onetime_data.push(result_array[question_num]);
+  onetime_data.push(img_array[question_num]);
+  onetime_data.push(1);
+  for(let i=0;i<8;i++){
+    onetime_data.push(checkflag[i]);
+  }
+  onetime_data.push(1);
+  alldata.push(onetime_data);
+  console.log(alldata[question_num+1]);
+  console.log(alldata);
+
   document.getElementById("answer_log").innerHTML = `<p>「${result_array[question_num]}」:あなたの前回の解答は「不良品」(正答率:${crt_ans_rate(result_array)}%)</p>`;
-  document.getElementById("answer_img").innerHTML = `<img id="sample"src="src/image0/${img_array[question_num] * 10}.jpg"width="500px"height="168px" style="display:block;">`;
+  document.getElementById("answer_img").innerHTML = `<img id="sample"src="src/image0/${img_array[question_num] }.jpg"width="500px"height="168px" style="display:block;">`;
 
   question_num++;
   document.getElementById("app").innerHTML = `<h1>No.${question_num + 1}</h1>`;
   const target = document.getElementById("sample");
-  target.setAttribute("src", `src/image0/${img_array[question_num] * 10}.jpg`);
-  target.setAttribute("alt", `画像の代わり${img_array[question_num] * 10}`);
+  target.setAttribute("src", `src/image0/${img_array[question_num] }.jpg`);
+  target.setAttribute("alt", `画像の代わり${img_array[question_num] }`);
 
  
   //let answer = postData_defective();
@@ -166,10 +304,11 @@ defective.addEventListener("click", () => countUp_defective());
 
 //GASにテータ送信
 function postData_quality() {
-  let URL ="https://script.google.com/macros/s/AKfycbxgsyQv-K9yhVyaTm3LAtn5tnmh3cewwZPY4mPe_-EU_glfubJA6h6J4LXjIXEL27QKIw/exec";  
+  let URL ="https://script.google.com/macros/s/AKfycbxrWSMdvoek5955DVvCix0P0MGaNz0_LCTPWA0TOc4iyp8pSM-0MdxGEiA_pZr6bzkJhw/exec";  
   let SendDATA = {
-    answer: quality.textContent,
-    sheetname: user,
+    //answer: quality.textContent,
+    answer: alldata,
+    sheetname: new_sheet,
 
   };
   var postparam = {
@@ -185,7 +324,7 @@ function postData_quality() {
 function postData_defective() {
   var dec = decision(1);
   let URL =
-    "https://script.google.com/macros/s/AKfycbxgsyQv-K9yhVyaTm3LAtn5tnmh3cewwZPY4mPe_-EU_glfubJA6h6J4LXjIXEL27QKIw/exec";
+    "https://script.google.com/macros/s/AKfycbw1J30g-tNRPCpAB7Q5PmfzQ_vbHMCBwEH0h-DbzzzIiRF9D3-IuhtHdzvYDJNYAWJ19A/exec";
   let SendDATA = {
     answer: defective.textContent,
   };
@@ -284,7 +423,7 @@ for (var k =0; k<clickBtn.length; k++){
   var img_src = [];
   for (let i = 0; i < que_cnt; i++) {
     images[i] = new Image();
-    img_src.push(img_array[question_num-10+i]*10);
+    img_src.push(img_array[question_num-10+i]);
     images[i].src = 'src/image0/'+img_src[i]+'.jpg';
   }
   var loadedCount = 0;
@@ -327,9 +466,20 @@ for (var k =0; k<clickBtn.length; k++){
 // ポップアップの外側又は戻るマークをクリックしたときポップアップを閉じる
 popupWrapper.addEventListener('click', e => {
   if (e.target.id === popupWrapper.id || e.target.id === close.id) {
-
+    var now = getCurrentTime();
+    var look_data = [];
+    look_data.push(now);
+    for(let i=1;i<data_size;i++){
+      look_data.push(""); 
+    }
+    console.log(look_data);
+    alldata.push(look_data);
+    console.log(alldata);
     popupWrapper.style.display = 'none';
+    if(question_num == 40){
+      let answer = postData_quality();
+      alert("ウインドウを閉じてください");
+    }
   }
 });
-
 
