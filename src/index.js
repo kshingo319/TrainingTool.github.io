@@ -10,7 +10,6 @@ while(user === ""){
   }  
 }
 
-console.log(user);
 
 var data_size = 14;
 var start_data = [];
@@ -47,7 +46,7 @@ function getCurrentDate() {
 }
 var train_date = getCurrentDate();
 var new_sheet = train_date + "_" +  user;
-console.log(new_sheet);
+
 /*
 var datetime = [];
 var copy = new Date();
@@ -60,9 +59,8 @@ start_data.push(now);
 for(let i=1;i<data_size;i++){
   start_data.push(""); 
 }
-console.log(start_data);
+
 alldata.push(start_data);
-console.log(alldata);
 
 
 
@@ -98,7 +96,7 @@ function chk(url){
       img.src = 'src/image0/'+url+'.jpg';
       img.onload = function () { 
         img_array.push(url);
-        console.log(img_array);
+   
         return resolve(url) 
       };
       img.onerror = function () { return reject(url) };
@@ -134,7 +132,7 @@ function arrayShuffle(array) {
 
 // 配列を5回シャッフルする
 for(let i=0; i < 5; i++) {
-  console.log(arrayShuffle(img_array));
+  arrayShuffle(img_array);
 }
 //var img_rand = Math.floor(Math.random() * (max + 1 - min)) + min;
 
@@ -144,7 +142,7 @@ for(let i=0; i < 5; i++) {
 //1問目の画像を描画
 const target1 = document.getElementById("sample");
 target1.setAttribute("src", `src/image0/${img_array[0]}.jpg`);
-console.log();
+
 
 //解いた問題がの正解・不正解を格納する配列
 var result_array = [];
@@ -212,8 +210,7 @@ function countUp_quality() {
   }
   onetime_data.push(1);
   alldata.push(onetime_data);
-  console.log(alldata[question_num+1]);
-  console.log(alldata);
+
 
   /*
   var  time = new Date();
@@ -275,8 +272,7 @@ function countUp_defective() {
   }
   onetime_data.push(1);
   alldata.push(onetime_data);
-  console.log(alldata[question_num+1]);
-  console.log(alldata);
+
 
   document.getElementById("answer_log").innerHTML = `<p>「${result_array[question_num]}」:あなたの前回の解答は「不良品」(正答率:${crt_ans_rate(result_array)}%)</p>`;
   document.getElementById("answer_img").innerHTML = `<img id="sample"src="src/image0/${img_array[question_num] }.jpg"width="500px"height="168px" style="display:block;">`;
@@ -472,9 +468,8 @@ popupWrapper.addEventListener('click', e => {
     for(let i=1;i<data_size;i++){
       look_data.push(""); 
     }
-    console.log(look_data);
     alldata.push(look_data);
-    console.log(alldata);
+    
     popupWrapper.style.display = 'none';
     if(question_num == 40){
       let answer = postData_quality();
