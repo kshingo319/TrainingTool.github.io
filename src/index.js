@@ -4,7 +4,7 @@
 var user = "";
 while(user === ""){
   user = window.prompt("学籍番号を入力してください", "");
-  if(user === ""){
+  if(user === "" || user === null || user === undefined){
     alert("学籍番号を入力してください");
     user = window.prompt("学籍番号を入力してください", "");
   }  
@@ -52,6 +52,11 @@ var datetime = [];
 var copy = new Date();
 datetime.push(copy);
 */
+//曜日によって使用するデータセットを変える
+var daytest = new Date();
+var day_id = daytest.getDay();
+var img_dataset =["image0","image1","image2","image3","image4"];
+var dataset_today = img_dataset[day_id-1];
 
 var now = getCurrentTime();
 
@@ -93,7 +98,7 @@ var img_array = [];
 function chk(url){
   return new Promise(function (resolve, reject) {
       const img = new Image();
-      img.src = 'src/image0/'+url+'.jpg';
+      img.src = 'src/'+dataset_today+'/'+url+'.jpg';
       img.onload = function () { 
         img_array.push(url);
    
@@ -141,7 +146,7 @@ for(let i=0; i < 5; i++) {
 
 //1問目の画像を描画
 const target1 = document.getElementById("sample");
-target1.setAttribute("src", `src/image0/${img_array[0]}.jpg`);
+target1.setAttribute("src", `src/${dataset_today}/${img_array[0]}.jpg`);
 
 
 //解いた問題がの正解・不正解を格納する配列
@@ -208,7 +213,7 @@ function countUp_quality() {
   for(let i=0;i<8;i++){
     onetime_data.push(checkflag[i]);
   }
-  onetime_data.push(1);
+  onetime_data.push(day_id);
   alldata.push(onetime_data);
 
 
@@ -226,12 +231,12 @@ function countUp_quality() {
   */
 
   document.getElementById("answer_log").innerHTML = `<p>「${result_array[question_num]}」:あなたの前回の解答は「良品」(正答率:${crt_ans_rate(result_array)}%)</p>`;
-  document.getElementById("answer_img").innerHTML = `<img id="sample"src="src/image0/${img_array[question_num]}.jpg"width="500px"height="168px" style="display:block;">`;
+  document.getElementById("answer_img").innerHTML = `<img id="sample"src="src/${dataset_today}/${img_array[question_num]}.jpg"width="500px"height="168px" style="display:block;">`;
 
   question_num++;
   document.getElementById("app").innerHTML = `<h1>No.${question_num + 1}</h1>`;
   const target = document.getElementById("sample");
-  target.setAttribute("src", `src/image0/${img_array[question_num]}.jpg`);
+  target.setAttribute("src", `src/${dataset_today}/${img_array[question_num]}.jpg`);
   target.setAttribute("alt", `画像の代わり${img_array[question_num]}`);
   
   //let answer = postData_quality();
@@ -270,17 +275,17 @@ function countUp_defective() {
   for(let i=0;i<8;i++){
     onetime_data.push(checkflag[i]);
   }
-  onetime_data.push(1);
+  onetime_data.push(day_id);
   alldata.push(onetime_data);
 
 
   document.getElementById("answer_log").innerHTML = `<p>「${result_array[question_num]}」:あなたの前回の解答は「不良品」(正答率:${crt_ans_rate(result_array)}%)</p>`;
-  document.getElementById("answer_img").innerHTML = `<img id="sample"src="src/image0/${img_array[question_num] }.jpg"width="500px"height="168px" style="display:block;">`;
+  document.getElementById("answer_img").innerHTML = `<img id="sample"src="src/${dataset_today}/${img_array[question_num] }.jpg"width="500px"height="168px" style="display:block;">`;
 
   question_num++;
   document.getElementById("app").innerHTML = `<h1>No.${question_num + 1}</h1>`;
   const target = document.getElementById("sample");
-  target.setAttribute("src", `src/image0/${img_array[question_num] }.jpg`);
+  target.setAttribute("src", `src/${dataset_today}/${img_array[question_num] }.jpg`);
   target.setAttribute("alt", `画像の代わり${img_array[question_num] }`);
 
  
@@ -409,7 +414,10 @@ var que_cnt = 10;
 for (var k =0; k<clickBtn.length; k++){
   clickBtn[k].addEventListener('click', () => {
   //console.log(question_num);
-  if(question_num % 10 == 0){
+   if(question_num % 10 == 0){
+    if(question_num == 40){
+      document.getElementById("close").innerHTML = `<button type="button"id="close">訓練を終了する</button>`;
+    }
   popupWrapper.style.display = "block";
   const target = document.getElementById("sample");
   var canvas = document.getElementById("board");
@@ -420,7 +428,7 @@ for (var k =0; k<clickBtn.length; k++){
   for (let i = 0; i < que_cnt; i++) {
     images[i] = new Image();
     img_src.push(img_array[question_num-10+i]);
-    images[i].src = 'src/image0/'+img_src[i]+'.jpg';
+    images[i].src = 'src/'+dataset_today+'/'+img_src[i]+'.jpg';
   }
   var loadedCount = 0;
   for(let i = 0; i < que_cnt; i++){
@@ -472,6 +480,7 @@ popupWrapper.addEventListener('click', e => {
     
     popupWrapper.style.display = 'none';
     if(question_num == 40){
+      document.getElementById("close").innerHTML = `<button type="button"id="close">訓練を終了する</button>`;
       let answer = postData_quality();
       alert("ウインドウを閉じてください");
     }
